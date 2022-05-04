@@ -1,0 +1,128 @@
+diff --git a/gma-ejb/.classpath b/gma-ejb/.classpath
+index f745cd7..b24984d 100644
+--- a/gma-ejb/.classpath
++++ b/gma-ejb/.classpath
+@@ -8,7 +8,6 @@
+ 		</attributes>
+ 	</classpathentry>
+ 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+-	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v9.0 plumee"/>
+ 	<classpathentry kind="con" path="org.eclipse.datatools.connectivity.jdt.DRIVERLIBRARY/MySQL JDBC Driver"/>
+ 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/eclipseLink">
+ 		<attributes>
+@@ -16,5 +15,6 @@
+ 			<attribute name="owner.project.facets" value="jpt.jpa"/>
+ 		</attributes>
+ 	</classpathentry>
++	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v9.0"/>
+ 	<classpathentry kind="output" path="build/classes"/>
+ </classpath>
+diff --git a/gma-ejb/ejbModule/LoginService.java b/gma-ejb/ejbModule/LoginService.java
+new file mode 100644
+index 0000000..f43704e
+--- /dev/null
++++ b/gma-ejb/ejbModule/LoginService.java
+@@ -0,0 +1,22 @@
++import javax.ejb.Stateless;
++import javax.inject.Inject;
++import javax.persistence.EntityManager;
++import javax.persistence.PersistenceContext;
++
++import it.polimi.gma.entities.Admin;
++import it.polimi.gma.entities.Consumer;
++import it.polimi.gma.entities.User;
++
++@Stateless
++public class LoginService {
++	@PersistenceContext(name = "gma-ejb")
++	EntityManager em;
++	
++	public User requestConsuerLogin(String username, String password) {
++		User u = em.find(Admin.class, username);
++		if (u == null) {
++			u = em.find(null, u); 
++		}
++		return null;
++	}
++}
+diff --git a/gma-ejb/ejbModule/it/polimi/gma/entities/Answer.java b/gma-ejb/ejbModule/it/polimi/gma/entities/Answer.java
+index 9f642fa..f199b6a 100644
+--- a/gma-ejb/ejbModule/it/polimi/gma/entities/Answer.java
++++ b/gma-ejb/ejbModule/it/polimi/gma/entities/Answer.java
+@@ -38,17 +38,18 @@ public class Answer implements Serializable{
+ 	// Relations
+ 	// ====================
+ 	
+-	@ManyToOne // sembrerebbe niente cascade, fetch default
++	@ManyToOne // sembrerebbe niente cascade (se modifichi una answer non devi cambiare l'utente, idem per rimozione, update e merge), fetch default
+ 	@JoinColumn(name = "USER_ID")
+ 	private Consumer consumer;
+ 	
+-	@ManyToOne(fetch = FetchType.LAZY) 
++	@ManyToOne(fetch = FetchType.LAZY) // no cascade perchè non vuoi modificare (o cancellare, aggiungere, ecc...) le domande se modifichi una risposta 
+ 		// Perchè quando prendi i Consumer dal Questionnaire passi per Answer e non ti interessano le Question
+ 		// Nel caso in cui dobbiamo vedere le risposte che ha dato un Consumer, ci servono le domande e facciamo la join con Question nella namedquery
+ 	@JoinColumn(name = "QUESTION_ID")
+ 	private Question question;
+ 	
+ 	@ManyToOne // Il fetch eager se non mettiamo la ManyToMany tra Consumer e Questionnaire
++		// il cascade è default perchè <come sopra>
+ 	@JoinColumn(name = "QUESTIONNAIRE_ID")
+ 	private Questionnaire questionnaire;
+ 	
+diff --git a/gma-web/.classpath b/gma-web/.classpath
+index e3585d7..eb9a72d 100644
+--- a/gma-web/.classpath
++++ b/gma-web/.classpath
+@@ -14,6 +14,6 @@
+ 	</classpathentry>
+ 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
+ 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+-	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v9.0 plumee"/>
++	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v9.0"/>
+ 	<classpathentry kind="output" path="build/classes"/>
+ </classpath>
+diff --git a/gma-web/src/it/polimi/gma/servlet/Login.java b/gma-web/src/it/polimi/gma/servlet/Login.java
+new file mode 100644
+index 0000000..8107471
+--- /dev/null
++++ b/gma-web/src/it/polimi/gma/servlet/Login.java
+@@ -0,0 +1,38 @@
++package it.polimi.gma.servlet;
++
++import java.io.IOException;
++import javax.servlet.ServletException;
++import javax.servlet.annotation.WebServlet;
++import javax.servlet.http.HttpServlet;
++import javax.servlet.http.HttpServletRequest;
++import javax.servlet.http.HttpServletResponse;
++
++/**
++ * Servlet implementation class Login
++ */
++@WebServlet(name = "LoginController", urlPatterns = { "/Login" })
++public class Login extends HttpServlet {
++	private static final long serialVersionUID = 1L;
++       
++    /**
++     * @see HttpServlet#HttpServlet()
++     */
++    public Login() {
++        super();
++    }
++
++	/**
++	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
++	 */
++	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
++		
++	}
++
++	/**
++	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
++	 */
++	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
++		doGet(request, response);
++	}
++
++}
