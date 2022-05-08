@@ -1,5 +1,7 @@
 # Data Bases 2 project
-Goal is to develop an easy-to-use web application whose main goal is to make reviews about products.
+Goal is to develop an easy-to-use web application whose main goal is to make reviews about products. 
+
+More details can be found here: [project specifications](https://github.com/zanelliriccardo/DataBases2-WebApp-project/blob/main/Optional%20Project%20Specifications%20V2!.pdf)
 
 # Database Schema
 In the following picture it is represented the design of the database schema.
